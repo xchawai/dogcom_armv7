@@ -11,7 +11,7 @@ jobs:
       - name: Checkout code
         uses: actions/checkout@v4
         with:
-          repository: 'miao1007/dogcom'
+          repository: 'mchome/dogcom'
 
       - name: Install 32-bit ARM Toolchain
         run: |

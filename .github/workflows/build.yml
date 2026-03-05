@@ -1,7 +1,7 @@
-name: Build dogcom for IPQ5312
+name: Build dogcom for IPQ5312 (32-bit ARMhf)
 
 on:
-  workflow_dispatch: # 支持手动触发编译
+  workflow_dispatch:
 
 jobs:
   build:
@@ -11,24 +11,26 @@ jobs:
       - name: Checkout code
         uses: actions/checkout@v4
         with:
-          repository: 'mchome/dogcom' # 自动拉取源码
+          repository: 'miao1007/dogcom'
 
-      - name: Install Toolchain
+      - name: Install 32-bit ARM Toolchain
         run: |
           sudo apt-get update
-          sudo apt-get install -y gcc-aarch64-linux-gnu make
+          # 安装针对 32 位 ARM 的交叉编译器
+          sudo apt-get install -y gcc-arm-linux-gnueabihf make
 
       - name: Compile
         run: |
-          # 使用 ARM64 交叉编译器，并进行静态编译以确保兼容性
-          make CC="aarch64-linux-gnu-gcc -static"
+          # 使用 arm-linux-gnueabihf-gcc 编译
+          # 加上 -static 是为了解决 musl/glibc 的兼容性问题，确保在你的固件上稳跑
+          make CC="arm-linux-gnueabihf-gcc -static"
           
-          # 压缩体积，这对你只有 15.5MB 的空间非常重要
-          aarch64-linux-gnu-strip dogcom
+          # 去除符号表减小体积
+          arm-linux-gnueabihf-strip dogcom
 
       - name: Upload Artifact
         uses: actions/upload-artifact@v4
         with:
-          name: dogcom-ipq5312-arm64
+          name: dogcom-ipq5312-armhf
           path: dogcom
           

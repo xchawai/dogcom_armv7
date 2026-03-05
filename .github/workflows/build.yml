@@ -1,0 +1,34 @@
+name: Build dogcom for IPQ5312
+
+on:
+  workflow_dispatch: # 支持手动触发编译
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+        with:
+          repository: 'mchome/dogcom' # 自动拉取源码
+
+      - name: Install Toolchain
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y gcc-aarch64-linux-gnu make
+
+      - name: Compile
+        run: |
+          # 使用 ARM64 交叉编译器，并进行静态编译以确保兼容性
+          make CC="aarch64-linux-gnu-gcc -static"
+          
+          # 压缩体积，这对你只有 15.5MB 的空间非常重要
+          aarch64-linux-gnu-strip dogcom
+
+      - name: Upload Artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: dogcom-ipq5312-arm64
+          path: dogcom
+          
